@@ -68,6 +68,9 @@ def vocab_build(vocab_path, corpus_path, min_count):
     print(len(word2id))
     with open(vocab_path, 'wb') as fw:
         pickle.dump(word2id, fw)
+        # python的pickle模块实现了基本的数据序列和反序列化。
+        # 通过pickle模块的序列化操作（pickle.dump(obj, file, [,protocol])）我们能够将程序中运行的对象信息保存到文件中去，永久存储；
+        # 通过pickle模块的反序列化操作（pickle.load(file)），我们能够从文件中创建上一次程序保存的对象。
 
 
 def sentence2id(sent, word2id):
@@ -97,7 +100,7 @@ def read_dictionary(vocab_path):
     """
     vocab_path = os.path.join(vocab_path)
     with open(vocab_path, 'rb') as fr:
-        word2id = pickle.load(fr)
+        word2id = pickle.load(fr)  # 反序列化
     print('vocab_size:', len(word2id))
     return word2id
 

@@ -11,20 +11,20 @@ from eval import conlleval
 
 class BiLSTM_CRF(object):
     def __init__(self, args, embeddings, tag2label, vocab, paths, config):
-        self.batch_size = args.batch_size
-        self.epoch_num = args.epoch
-        self.hidden_dim = args.hidden_dim
-        self.embeddings = embeddings
-        self.CRF = args.CRF
-        self.update_embedding = args.update_embedding
-        self.dropout_keep_prob = args.dropout
-        self.optimizer = args.optimizer
-        self.lr = args.lr
-        self.clip_grad = args.clip
-        self.tag2label = tag2label
-        self.num_tags = len(tag2label)
-        self.vocab = vocab
-        self.shuffle = args.shuffle
+        self.batch_size = args.batch_size                  # 64
+        self.epoch_num = args.epoch                        # 40
+        self.hidden_dim = args.hidden_dim                  # 300
+        self.embeddings = embeddings                       # len(vocab) * 300
+        self.CRF = args.CRF                                # True
+        self.update_embedding = args.update_embedding      # True
+        self.dropout_keep_prob = args.dropout              # 0.5
+        self.optimizer = args.optimizer                    # Adam
+        self.lr = args.lr                                  # 0.001
+        self.clip_grad = args.clip                         # 5.0
+        self.tag2label = tag2label                         # BIO
+        self.num_tags = len(tag2label)                     # 7
+        self.vocab = vocab                                 # word2id
+        self.shuffle = args.shuffle                        # True
         self.model_path = paths['model_path']
         self.summary_path = paths['summary_path']
         self.logger = get_logger(paths['log_path'])
@@ -54,6 +54,7 @@ class BiLSTM_CRF(object):
                                            dtype=tf.float32,
                                            trainable=self.update_embedding,
                                            name="_word_embeddings")
+            # tf.nn.embedding_lookup函数的用法主要是选取一个张量里面索引对应的元素
             word_embeddings = tf.nn.embedding_lookup(params=_word_embeddings,
                                                      ids=self.word_ids,
                                                      name="word_embeddings")
@@ -72,6 +73,7 @@ class BiLSTM_CRF(object):
             output = tf.concat([output_fw_seq, output_bw_seq], axis=-1)
             output = tf.nn.dropout(output, self.dropout_pl)
 
+         # B-LSTM的输出经过一个线性层，预测序列的类别
         with tf.variable_scope("proj"):
             W = tf.get_variable(name="W",
                                 shape=[2 * self.hidden_dim, self.num_tags],
@@ -91,6 +93,7 @@ class BiLSTM_CRF(object):
 
     def loss_op(self):
         if self.CRF:
+            # transition_params是转移矩阵
             log_likelihood, self.transition_params = crf_log_likelihood(inputs=self.logits,
                                                                    tag_indices=self.labels,
                                                                    sequence_lengths=self.sequence_lengths)
@@ -130,6 +133,7 @@ class BiLSTM_CRF(object):
 
             grads_and_vars = optim.compute_gradients(self.loss)
             grads_and_vars_clip = [[tf.clip_by_value(g, -self.clip_grad, self.clip_grad), v] for g, v in grads_and_vars]
+            # 梯度消减，防止梯度爆炸
             self.train_op = optim.apply_gradients(grads_and_vars_clip, global_step=self.global_step)
 
     def init_op(self):
@@ -157,6 +161,7 @@ class BiLSTM_CRF(object):
             sess.run(self.init_op)
             self.add_summary(sess)
 
+            # 迭代训练40次
             for epoch in range(self.epoch_num):
                 self.run_one_epoch(sess, train, dev, self.tag2label, epoch, saver)
 

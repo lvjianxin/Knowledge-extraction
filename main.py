@@ -14,7 +14,7 @@ config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction = 0.2  # need ~700MB GPU memory
 
 
-## hyperparameters超参数
+## hyperparameters
 parser = argparse.ArgumentParser(description='BiLSTM-CRF for Chinese NER task')
 parser.add_argument('--train_data', type=str, default='data_path', help='train data source')
 parser.add_argument('--test_data', type=str, default='data_path', help='test data source')
@@ -35,8 +35,10 @@ parser.add_argument('--demo_model', type=str, default='1521112368', help='model 
 args = parser.parse_args()
 
 
-## get char embeddings
+## 构造输入向量
+# word2id.pkl文件是由执行data.vocab_build生成，去除语料中的低频词后给每一个词一个递增的编号，构造对应的词典
 word2id = read_dictionary(os.path.join('.', args.train_data, 'word2id.pkl'))
+# 每个charactor 入参随机初始化为300维向量（根据word2id来选择矩阵的某一行）
 if args.pretrain_embedding == 'random':
     embeddings = random_embedding(word2id, args.embedding_dim)
 else:
@@ -52,7 +54,7 @@ if args.mode != 'demo':
     test_data = read_corpus(test_path); test_size = len(test_data)
 
 
-## paths setting
+## 路径设置
 paths = {}
 timestamp = str(int(time.time())) if args.mode == 'train' else args.demo_model
 output_path = os.path.join('.', args.train_data+"_save", timestamp)
