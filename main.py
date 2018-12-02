@@ -14,7 +14,7 @@ config.gpu_options.allow_growth = True
 config.gpu_options.per_process_gpu_memory_fraction = 0.2  # need ~700MB GPU memory
 
 
-## hyperparameters
+## hyperparameters超参数123
 parser = argparse.ArgumentParser(description='BiLSTM-CRF for Chinese NER task')
 parser.add_argument('--train_data', type=str, default='data_path', help='train data source')
 parser.add_argument('--test_data', type=str, default='data_path', help='test data source')
