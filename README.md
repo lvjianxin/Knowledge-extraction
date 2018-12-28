@@ -29,7 +29,7 @@
 
 ![去除CRF层的BiLSTM模型](https://github.com/lvjianxin/Knowledge-extraction/blob/master/img-folder/2.png)
 
-在神经网络的输出层接入CRF层(重点是利用标签转移概率)来做句子级别的标签预测，使得标注过程不再是对各个token独立分类。
+在神经网络的输出层接入CRF层(重点是利用标签转移概率)来做句子级别的标签预测，使得标注过程不再是对各个token独立分类。biLSTM计算出的是每个词的各标签概率，而CRF层引入序列的转移概率，最终计算出loss反馈回网络。
 
 **CRF层能从训练数据中获得约束性的规则**
 
