@@ -28,6 +28,7 @@
 虽然我们可以得到句子x中每个单元的正确标签，但是我们不能保证标签每次都是预测正确的。例如，图2.中的例子，标签序列是“I-Organization I-Person” and “B-Organization I-Person”，很显然这是错误的。
 
 ![去除CRF层的BiLSTM模型](https://github.com/lvjianxin/Knowledge-extraction/blob/master/img-folder/2.png)
+
 在神经网络的输出层接入CRF层(重点是利用标签转移概率)来做句子级别的标签预测，使得标注过程不再是对各个token独立分类。
 
 **CRF层能从训练数据中获得约束性的规则**
